@@ -55,7 +55,7 @@ class TableDefinitios {
   total DOUBLE not null,
   discount DOUBLE null,
   id_status INTEGER not null,
-  id_client INTEGER not null,
+  id_client INTEGER null,
   FOREIGN KEY (id_status) REFERENCES status(id),
   FOREIGN KEY (id_client) REFERENCES client(id)
   )

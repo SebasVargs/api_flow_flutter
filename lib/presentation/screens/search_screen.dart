@@ -36,7 +36,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
+          padding: const EdgeInsets.only(top: 50, left: 16, right: 16, bottom: 16),
           child: TextField(
             controller: _searchController,
             decoration: const InputDecoration(
@@ -58,7 +58,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           borderRadius:
                               BorderRadius.circular(12)), // Bordes redondeados
                       elevation: 4, // Sombra para resaltar
-                      child: ListTile(
+                      child: const ListTile(
                       ),
                     );
                   },

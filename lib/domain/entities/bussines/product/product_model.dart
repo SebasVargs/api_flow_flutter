@@ -29,7 +29,7 @@ class ProductModel implements ProductInterface{
     required this.id_category
   });
 
-    factory ProductModel.fromJson(Map<String, dynamic> json){
+  factory ProductModel.fromJson(Map<String, dynamic> json){
     return ProductModel(
       id: json['id'],
       name: json['name'],
