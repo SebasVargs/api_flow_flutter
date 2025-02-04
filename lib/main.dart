@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:api_control_flow/components/navbar/nav_navigation.dart';
+import 'package:api_control_flow/presentation/screens/home/navbar/nav_navigation.dart';
 void main() {
   runApp(const MyApp());
 }
