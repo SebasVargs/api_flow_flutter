@@ -1,10 +1,13 @@
-abstract class SupplyInterface {
+abstract class BuysDetailInterface {
   int? get id;
-  String get name;
+  String get description;
   int get stock;
-  double get weight;
+  double? get weight;
+  double? get size;
   double get unit_cost;
   int get id_measure;
+  int? get id_buys;
+  int get id_category;
   
   Map<String, dynamic> toJson();
   Map<String, dynamic> toMap();

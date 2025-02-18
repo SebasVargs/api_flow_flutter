@@ -1,18 +1,56 @@
-import 'package:api_control_flow/domain/entities/bussines/category/category_model.dart';
-import 'package:api_control_flow/domain/repositories/bussines/category_repository.dart';
+import 'package:api_control_flow/domain/entities/bussines/category_pro/category_pro_model.dart';
+import 'package:api_control_flow/domain/repositories/bussines/category_pro_repository.dart';
 import 'package:sqflite/sqflite.dart';
 
-class CategoryApiDataSource implements CategoryRepository{
+class CategoryProApiDataSource implements CategoryProRepository{
   final Database db;
 
-  CategoryApiDataSource({required this.db});
+  CategoryProApiDataSource({required this.db});
 
   @override
-  Future<List<CategoryModel>> getCategories() async {
+  Future<List<CategoryProModel>> getCategoriesPro() async {
     final List<Map<String, dynamic>> maps = await db.query('category');
     return List.generate(maps.length, (i) {
-      return CategoryModel.fromMap(maps[i]);
+      return CategoryProModel.fromMap(maps[i]);
     });
+  }
+
+  @override
+  Future<int> insertCategoryPro(CategoryProModel category) async {
+    try {
+      return await db.insert('category', category.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace
+      );
+    } catch (err) {
+      throw Exception('Error al insertar una categoria: $err');
+    } 
+  }
+
+  @override
+  Future<int> updateCategoryPro(CategoryProModel category) async {
+    try {
+      return await db.update(
+        'category',
+        category.toMap(),
+        where: 'id = ?',
+        whereArgs: [category.id],
+      );
+    } catch (err) {
+      throw Exception('Error al actualizar el producto: $err');
+    }
+  }
+
+  @override
+  Future<int> deleteCategoryPro(int id) async {
+    try {
+      return await db.delete(
+        'category',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (err) {
+      throw Exception('Error al borrar una categoria: $err');
+    }
   }
 
 }

@@ -91,7 +91,7 @@ class _ProductoScreenState extends State<ProductoScreen> {
 @override
   Widget build(BuildContext context) {
     return Scaffold( // El Scaffold es el widget raíz
-      appBar: AppBar(title: const Text('Insumos')),
+      appBar: AppBar(title: const Text('Productos')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column( // El Column va *dentro* del body del Scaffold
@@ -109,7 +109,7 @@ class _ProductoScreenState extends State<ProductoScreen> {
                   }
                 });
               },
-              child: const Text('Agregar Insumo'),
+              child: const Text('Agregar Producto'),
             ),
             const SizedBox(height: 20),
             Padding( // Widget de búsqueda (va dentro del Column)
@@ -125,7 +125,7 @@ class _ProductoScreenState extends State<ProductoScreen> {
             ),
             Expanded( // El Expanded también va dentro del Column
               child: _filteredProducts.isEmpty
-                  ? const Center(child: Text('No se encontraron insumos'))
+                  ? const Center(child: Text('No se encontraron productos'))
                   : ListView.builder(
                       itemCount: _filteredProducts.length,
                       itemBuilder: (context, index) {

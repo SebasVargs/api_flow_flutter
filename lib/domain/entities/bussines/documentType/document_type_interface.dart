@@ -1,4 +1,4 @@
-abstract class CategoryInterface {
+abstract class DocumentTypeInterface {
   int? get id;
   String get name;
 

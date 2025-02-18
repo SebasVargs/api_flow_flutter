@@ -39,7 +39,10 @@ class _ProveedorScreenState extends State<ProveedorScreen> {
     final db = await dbHelper.database;
     _supplierRepository = SupplierApiDataSource(db: db);
     await _loadSuppliers();
+
   }
+
+
 
   Future<void> _loadSuppliers() async {
     final proveedores = await _supplierRepository.getSuppliers();
@@ -53,7 +56,7 @@ class _ProveedorScreenState extends State<ProveedorScreen> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredSuppliers = _suppliers
-        .where((h) => h.name.toLowerCase().contains(query))
+        .where((h) => h.company_name.toLowerCase().contains(query))
           .toList();
     });
   }
@@ -139,12 +142,14 @@ class _ProveedorScreenState extends State<ProveedorScreen> {
                           child: ListTile(
                             contentPadding: const EdgeInsets.all(16),
                             title: Text(
-                              proveedor.name,
+                              proveedor.company_name,
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                Text(proveedor.document_number),
+                                Text(proveedor.id_city.toString()),
                                 Text(proveedor.phone),
                                 Text(proveedor.email),
                                 Text(proveedor.address),

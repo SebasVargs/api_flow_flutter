@@ -10,59 +10,80 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, dynamic>> _supplies = [];
   final dbHelper = DatabaseHelper();
-
-  Future<void> _loadSupplies() async {
-    try {
-      final suppliesData = await dbHelper.obtenerTodosLosSupplies();
-      setState(() {
-        _supplies = suppliesData;
-        print('Todos los supplies: $_supplies'); // Imprime los supplies
-      });
-    } catch (e) {
-      print('Error al cargar los supplies: $e');
-    }
-  }
+  List<dynamic> _orders = []; // Simulación de lista de pedidos
 
   @override
   void initState() {
     super.initState();
-    _loadSupplies();
+    _loadOrders();
+  }
+
+  void _loadOrders() {
+    // Simulación de carga de pedidos (deberías reemplazar con la consulta a tu base de datos)
+    setState(() {
+      _orders = [
+        {'name': 'Pedido 1', 'quantity': 10},
+        {'name': 'Pedido 2', 'quantity': 5},
+      ]; // Simula que no hay pedidos
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 50, left: 16, right: 16, bottom: 16),
-          child: TextField(
-            controller: _searchController,
-            decoration: const InputDecoration(
-              hintText: 'Buscar...',
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(),
-            ),
-          ),
-        ),
-        Expanded(
-          child: 
-              ListView.builder(
-                  itemBuilder: (context, index) {
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8), // Espaciado entre tarjetas
-                      shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(12)), // Bordes redondeados
-                      elevation: 4, // Sombra para resaltar
-                      child: const ListTile(
-                      ),
-                    );
-                  },
+        Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 50, left: 16, right: 16, bottom: 16),
+              child: TextField(
+                controller: _searchController,
+                decoration: const InputDecoration(
+                  hintText: 'Buscar...',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
                 ),
+              ),
+            ),
+            Expanded(
+              child: _orders.isEmpty
+                  ? const Center(
+                      child: Text(
+                        "Agregar pedido",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w200),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: _orders.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 4,
+                          child: ListTile(
+                            title: Text(_orders[index]['name']),
+                            subtitle: Text('Cantidad: ${_orders[index]['quantity']}'),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: FloatingActionButton(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            onPressed: () {
+              setState(() {
+                _orders.add({'name': 'Nuevo pedido', 'quantity': 1});
+              });
+            },
+            backgroundColor: Colors.blueGrey,
+            child: const Icon(Icons.add, size: 40),
+          ),
         ),
       ],
     );

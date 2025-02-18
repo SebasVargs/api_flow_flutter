@@ -6,7 +6,7 @@ class GetSupplyByIdUseCase {
 
   GetSupplyByIdUseCase(this.supplyRepository);
 
-  Future<SupplyModel?> execute(int id){
+  Future<BuysDetailModel?> execute(int id){
     return supplyRepository.getSupplyById(id);
   }
 }

@@ -1,6 +1,15 @@
 import 'package:api_control_flow/db/database_helper.dart';
+import 'package:api_control_flow/domain/entities/bussines/city/city_model.dart';
+import 'package:api_control_flow/domain/entities/bussines/department/department_model.dart';
+import 'package:api_control_flow/domain/entities/bussines/documentType/document_type_model.dart';
 import 'package:api_control_flow/domain/entities/users/supplier/supplier_model.dart';
+import 'package:api_control_flow/domain/repositories/bussines/city_repository.dart';
+import 'package:api_control_flow/domain/repositories/bussines/department_repository.dart';
+import 'package:api_control_flow/domain/repositories/bussines/document_type_repository.dart';
 import 'package:api_control_flow/domain/repositories/users/supplier_repository.dart';
+import 'package:api_control_flow/infraestructure/data_sources/bussines/city_api_data_source.dart';
+import 'package:api_control_flow/infraestructure/data_sources/bussines/department_api_data_source.dart';
+import 'package:api_control_flow/infraestructure/data_sources/bussines/document_type_api_data_source.dart';
 import 'package:api_control_flow/infraestructure/data_sources/users/supplier_api_data_source.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
@@ -15,12 +24,24 @@ class ProveedorFormScreen extends StatefulWidget {
 class _ProveedorFormScreenState extends State<ProveedorFormScreen> {
   final dbHelper = DatabaseHelper();
   late SupplierRepository _supplierRepository;
+  late CityRepository _cityRepository;
+  late DepartmentRepository _departmentRepository;
+  late DocumentTypeRepository _documentTypeRepository;
+
+  int? _selectedCityId;
+  int? _selectedDepartmentId;
+  int? _selectedDocumentTypeId;
 
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  final _companyNameController = TextEditingController();
+  final _documentNumberController = TextEditingController();
+  final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
-  final _addressController = TextEditingController();
+
+  List<CityModel> _cities = [];
+  List<DepartmentModel> _departments = [];
+  List<DocumentTypeModel> _document_type = [];
 
   OverlayEntry? _bannerEntry;
 
@@ -33,8 +54,28 @@ class _ProveedorFormScreenState extends State<ProveedorFormScreen> {
   Future<void> _initDatabaseAndRepository() async {
     final db =
         await dbHelper.database; // Obtén la instancia de la base de datos
-    _supplierRepository =
-        SupplierApiDataSource(db: db); // Inicializa el repositorio
+    _supplierRepository = SupplierApiDataSource(db: db);
+    _cityRepository = CityApiDataSource(db: db);
+    _departmentRepository = DepartmentApiDataSource(db: db);
+    _documentTypeRepository = DocumentTypeApiDataSource(db: db);
+    await _loadCities();
+    await _loadDeparments();
+    await _loadDocumentType();
+  }
+
+  Future<void> _loadDocumentType() async {
+    final tDocument = await _documentTypeRepository.getDocumentsType();
+    setState(() => _document_type = tDocument);
+  }
+
+  Future<void> _loadCities() async {
+    final ciudades = await _cityRepository.getCities();
+    setState(() => _cities = ciudades);
+  }
+
+  Future<void> _loadDeparments() async {
+    final departamentos = await _departmentRepository.getDepartments();
+    setState(() => _departments = departamentos);
   }
 
   void _mostrarBanner(BuildContext context) {
@@ -92,7 +133,7 @@ class _ProveedorFormScreenState extends State<ProveedorFormScreen> {
           child: Column(
             children: [
               TextFormField(
-                controller: _nameController,
+                controller: _companyNameController,
                 decoration: InputDecoration(
                   labelText: 'Nombre',
                   border: OutlineInputBorder(
@@ -107,6 +148,83 @@ class _ProveedorFormScreenState extends State<ProveedorFormScreen> {
                 autofocus: true,
               ),
               const SizedBox(height: 16.0),
+              DropdownButtonFormField<int>(
+                decoration: InputDecoration(
+                  labelText: 'Tipo de documento',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0)),
+                ),
+                value: _selectedDocumentTypeId,
+                items: _document_type.map((docT) {
+                  return DropdownMenuItem<int>(
+                    value: docT.id,
+                    child: Text(docT.name),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  _selectedDocumentTypeId = value;
+                },
+                validator: (value) =>
+                    value == null ? 'Por favor, selecciona un proveedor' : null,
+              ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                controller: _documentNumberController,
+                decoration: InputDecoration(
+                  labelText: 'Numero de documento',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0)),
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, ingresa el nombre';
+                  }
+                  return null;
+                },
+                autofocus: true,
+              ),
+              const SizedBox(height: 16.0),
+              DropdownButtonFormField<int>(
+                decoration: InputDecoration(
+                  labelText: 'Departamento',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0)),
+                ),
+                value: _selectedDepartmentId,
+                items: _departments.map((department) {
+                  return DropdownMenuItem<int>(
+                    value: department.id,
+                    child: Text(department.name),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  _selectedDepartmentId = value;
+                },
+                validator: (value) =>
+                    value == null ? 'Por favor, selecciona un proveedor' : null,
+              ),
+              const SizedBox(height: 16.0),
+              DropdownButtonFormField<int>(
+                decoration: InputDecoration(
+                  labelText: 'Ciudad',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0)),
+                ),
+                value: _selectedCityId,
+                items: _cities.map((city) {
+                  return DropdownMenuItem<int>(
+                    value: city.id,
+                    child: Text(city.name),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  _selectedCityId = value;
+                },
+                validator: (value) =>
+                    value == null ? 'Por favor, selecciona un proveedor' : null,
+              ),
+              const SizedBox(height: 16.0),
               TextFormField(
                 controller: _phoneController,
                 decoration: InputDecoration(
@@ -117,6 +235,7 @@ class _ProveedorFormScreenState extends State<ProveedorFormScreen> {
                       borderSide: BorderSide(
                           color: Colors.red)), // Estilo para el error
                 ),
+                keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, ingresa el teléfono';
@@ -158,22 +277,41 @@ class _ProveedorFormScreenState extends State<ProveedorFormScreen> {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    final nuevoProveedor = SupplierModel(
-                      id: null, // Asegúrate de que tu modelo maneje IDs nulos
-                      name: _nameController.text,
-                      phone: _phoneController.text,
-                      email: _emailController.text,
-                      address: _addressController.text,
-                    );
+                    try {
+                      final newSupplier = SupplierModel(
+                          id: null,
+                          company_name: _companyNameController.text,
+                          document_number: _documentNumberController.text,
+                          phone: _phoneController.text,
+                          email: _emailController.text,
+                          address: _addressController.text,
+                          id_document_type: _selectedDocumentTypeId!,
+                          id_city: _selectedCityId!,
+                          id_department: _selectedDepartmentId!);
 
-                    await _supplierRepository.insertSupplier(nuevoProveedor);
+                      await _supplierRepository.insertSupplier(newSupplier);
 
-                    _nameController.clear();
-                    _phoneController.clear();
-                    _emailController.clear();
-                    _addressController.clear();
+                      _companyNameController.clear();
+                      _documentNumberController.clear();
+                      _phoneController.clear();
+                      _emailController.clear();
+                      _addressController.clear();
 
-                    _mostrarBanner(context);
+                      setState(() {
+                        _selectedDocumentTypeId = null;
+                        _selectedCityId = null;
+                        _selectedDepartmentId = null;
+                      });
+
+                      _mostrarBanner(context);
+                    } catch (err) {
+                      print('Error al guardar el proveedor: $err');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content:
+                                Text('Error al guardar el proveedor: $err')),
+                      );
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(

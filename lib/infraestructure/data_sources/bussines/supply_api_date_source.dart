@@ -8,7 +8,7 @@ class SupplyApiDateSource implements SupplyRepository {
   SupplyApiDateSource({required this.db});
 
   @override
-  Future<int> insertSupply(SupplyModel supply) async {
+  Future<int> insertSupply(BuysDetailModel supply) async {
     try {
       return await db.insert('supply', supply.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace);
@@ -18,11 +18,11 @@ class SupplyApiDateSource implements SupplyRepository {
   }
 
   @override
-  Future<List<SupplyModel>> getSupplies() async {
+  Future<List<BuysDetailModel>> getSupplies() async {
     try {
       final List<Map<String, dynamic>> maps = await db.query('supply');
       return List.generate(maps.length, (i) {
-        return SupplyModel.fromMap(maps[i]);
+        return BuysDetailModel.fromMap(maps[i]);
       });
     } catch (err) {
       throw Exception('Error al obtener los insumos: $err');
@@ -30,7 +30,7 @@ class SupplyApiDateSource implements SupplyRepository {
   }
 
   @override
-  Future<int> updateSupply(SupplyModel supply) async {
+  Future<int> updateSupply(BuysDetailModel supply) async {
     try {
       return await db.update(
         'supply',
@@ -57,7 +57,7 @@ class SupplyApiDateSource implements SupplyRepository {
   }
 
   @override
-  Future<SupplyModel?> getSupplyById(int id) async {
+  Future<BuysDetailModel?> getSupplyById(int id) async {
     try {
       final List<Map<String, dynamic>> maps = await db.query(
         'supply',
@@ -66,7 +66,7 @@ class SupplyApiDateSource implements SupplyRepository {
         limit: 1,
       );
       if (maps.isNotEmpty) {
-        return SupplyModel.fromMap(maps[0]);
+        return BuysDetailModel.fromMap(maps[0]);
       } else {
         return null;
       }

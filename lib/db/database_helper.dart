@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:api_control_flow/db/scripts/insert_definitions.dart';
 import 'package:api_control_flow/db/scripts/table_definitions.dart';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_migration/sqflite_migration.dart';
@@ -22,9 +23,14 @@ class DatabaseHelper {
 
     final config = MigrationConfig(
       initializationScript: [
-        TableDefinitios.status,
+        TableDefinitios.methOfPayment,
+        TableDefinitios.documentType,
+        TableDefinitios.city,
+        TableDefinitios.department,
+        TableDefinitios.statusBill,
         TableDefinitios.measure,
-        TableDefinitios.category,
+        TableDefinitios.categorySup,
+        TableDefinitios.categoryPro,
         TableDefinitios.type,
         TableDefinitios.client,
         TableDefinitios.clienType,
@@ -35,19 +41,27 @@ class DatabaseHelper {
         TableDefinitios.supplier,
         TableDefinitios.buys,
         TableDefinitios.supply,
-        TableDefinitios.buysDetail,
         TableDefinitios.saleDetail,
         TableDefinitios.tpyeCash,
         TableDefinitios.conceptCash,
         TableDefinitios.cashFlow,
         TableDefinitios.user,
-        InsertDefinitions.category,
+        TableDefinitios.transmitter,
+        TableDefinitios.bill,
+        TableDefinitios.detailBill,
+        InsertDefinitions.methOfPayment,
+        InsertDefinitions.documentType,
+        InsertDefinitions.statusBill,
         InsertDefinitions.measure,
-        InsertDefinitions.status,
+        InsertDefinitions.categorySup,
+        InsertDefinitions.categoryPro,
         InsertDefinitions.type,
         InsertDefinitions.paymentMeth,
         InsertDefinitions.typeCash,
-        InsertDefinitions.conceptCash
+        InsertDefinitions.conceptCash,
+        InsertDefinitions.user,
+        InsertDefinitions.city,
+        InsertDefinitions.department
       ],
       migrationScripts: [ // Scripts de migración (para versiones futuras)
          // Ejemplo: Creación de la tabla "maps"

@@ -1,9 +1,9 @@
 import 'package:api_control_flow/domain/entities/bussines/supply/supply_model.dart';
 
 abstract class SupplyRepository {
-  Future<List<SupplyModel>> getSupplies();
-  Future<int> insertSupply(SupplyModel supply);
-  Future<int> updateSupply(SupplyModel supply);
+  Future<List<BuysDetailModel>> getSupplies();
+  Future<int> insertSupply(BuysDetailModel supply);
+  Future<int> updateSupply(BuysDetailModel supply);
   Future<int> deleteSupply(int id);
-  Future<SupplyModel?> getSupplyById(int id);
+  Future<BuysDetailModel?> getSupplyById(int id);
 }

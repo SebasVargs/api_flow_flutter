@@ -1,7 +1,24 @@
 class InsertDefinitions {
+  static const methOfPayment = '''
+  INSERT INTO meth_of_payment (name) VALUES
+  ('Contado'),
+  ('Crédito'),
+  ('Cuotas'),
+  ('Contra entrega'),
+  ('Anticipado')
+  ''';
 
-  static const status = '''
-  INSERT INTO status (name) VALUES
+  static const documentType = '''
+  INSERT INTO document_type (name) VALUES
+  ('Cédula de Ciudadanía'),
+  ('Tarjeta de Identidad'),
+  ('Registro Civil'),
+  ('Cédula de Extranjería'),
+  ('Pasaporte')
+  ''';
+
+  static const statusBill = '''
+  INSERT INTO status_bill (name) VALUES
   ('Pendiente'),
   ('Pagado'),
   ('Vencido'),
@@ -11,8 +28,10 @@ class InsertDefinitions {
 
   static const measure = '''
   INSERT INTO measure (name) VALUES
+  ('NIU'),
   ('Tonelada'),
   ('Kilogramo'),
+  ('Libra'),
   ('Gramo'),
   ('Litro'),
   ('Mililitro'),
@@ -20,13 +39,32 @@ class InsertDefinitions {
   ('Onza')
   ''';
 
-  static const category = '''
-  INSERT INTO category (name) VALUES
-  ('Guanabana'),
-  ('Mora'),
-  ('Fresa'),
+  static const categorySup = '''
+  INSERT INTO category_sup (name) VALUES
+  ('Lulo'),
+  ('Guanábana'),
   ('Guayaba'),
-  ('Piña')
+  ('Fresa'),
+  ('Mora'),
+  ('Mango'),
+  ('Piña'),
+  ('Maracuyá')
+  ''';
+
+  static const categoryPro = '''
+  INSERT INTO category_sup (name) VALUES
+  ('Lulo'),
+  ('Guanábana'),
+  ('Guayaba'),
+  ('Fresa'),
+  ('Mora'),
+  ('Mango'),
+  ('Piña'),
+  ('Maracuyá'),
+  ('Maracumango'),
+  ('Limonada de feijoa'),
+  ('Tomate de árbol'),
+  ('Frutos rojos')
   ''';
 
   static const type = '''
@@ -61,4 +99,54 @@ class InsertDefinitions {
   ('Impuestos')
   ''';
 
+  static const city = '''
+  INSERT INTO city (name) VALUES
+  ('Duitama'),
+  ('Paipa'),
+  ('Santa Rosa de Viterbo'),
+  ('Sogamoso'),
+  ('Nobsa'),
+  ('Floresta'),
+  ('Belén'),
+  ('Tibasosa'),
+  ('Corrales'),
+  ('Busbanzá'),
+  ('Betéitiva'),
+  ('Iza'),
+  ('Firavitoba'),
+  ('Pesca'),
+  ('Toca'),
+  ('Tunja'),
+  ('Chivatá'),
+  ('Gámeza'),
+  ('Tópaga'),
+  ('Monguí'),
+  ('Mongua'),
+  ('Bucaramanga'),
+  ('Floridablanca'),
+  ('Girón'),
+  ('Piedecuesta'),
+  ('Barrancabermeja'),
+  ('San Gil'),
+  ('Socorro'),
+  ('Barranco de Loba'),
+  ('Málaga'),
+  ('Sabana de Torres'),
+  ('Other')
+  ''';
+
+  static const department = '''
+  INSERT INTO department (name) VALUES
+  ('Boyacá'),
+  ('Santander'),
+  ('Cundinamarca'),
+  ('Meta'),
+  ('Casanare'),
+  ('Arauca')
+  ''';
+
+  static const user = '''
+  INSERT INTO user (name, username, email, password, image_uri) VALUES
+  ('Laura Barroso', 'laura', 'laurabarroso@gmail.com', 'root', '')
+  ''';
 }

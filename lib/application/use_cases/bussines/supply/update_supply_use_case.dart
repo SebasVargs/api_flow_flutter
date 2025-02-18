@@ -6,7 +6,7 @@ class UpdateSupplyUseCase {
 
   UpdateSupplyUseCase(this.supplyRepository);
 
-  Future<int> execute(SupplyModel supply){
+  Future<int> execute(BuysDetailModel supply){
     return supplyRepository.updateSupply(supply);
   }
 }

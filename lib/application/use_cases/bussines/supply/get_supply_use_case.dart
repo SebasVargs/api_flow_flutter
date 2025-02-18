@@ -6,7 +6,7 @@ class GetSupplyUseCase {
 
   GetSupplyUseCase(this.supplyRepository);
 
-  Future<List<SupplyModel>> execute( ){
+  Future<List<BuysDetailModel>> execute( ){
     return supplyRepository.getSupplies();
   }
 }

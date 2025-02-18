@@ -1,25 +1,26 @@
-import 'package:api_control_flow/domain/entities/bussines/category/category_interface.dart';
 
-class CategoryModel implements CategoryInterface {
+import 'package:api_control_flow/domain/entities/bussines/category_sup/category_sup_interface.dart';
+
+class CategorySupModel implements CategorySupInterface {
   @override
   final int? id;
   @override
   final String name;
 
-  CategoryModel({
+  CategorySupModel({
     required this.id,
     required this.name,
   });
 
-  factory CategoryModel.fromJson(Map<String, dynamic> json) {
-    return CategoryModel(
+  factory CategorySupModel.fromJson(Map<String, dynamic> json) {
+    return CategorySupModel(
       id: json['id'],
       name: json['name'],
     );
   }
 
-  factory CategoryModel.fromMap(Map<String, dynamic> map) {
-    return CategoryModel(
+  factory CategorySupModel.fromMap(Map<String, dynamic> map) {
+    return CategorySupModel(
       id: map['id'],
       name: map['name'],
     );

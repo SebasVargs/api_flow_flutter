@@ -1,8 +1,8 @@
 import 'package:api_control_flow/db/database_helper.dart';
-import 'package:api_control_flow/domain/entities/bussines/category/category_model.dart';
+import 'package:api_control_flow/domain/entities/bussines/category_pro/category_pro_model.dart';
 import 'package:api_control_flow/domain/entities/bussines/measure/measure_model.dart';
 import 'package:api_control_flow/domain/entities/bussines/supply/supply_model.dart';
-import 'package:api_control_flow/domain/repositories/bussines/category_repository.dart';
+import 'package:api_control_flow/domain/repositories/bussines/category_pro_repository.dart';
 import 'package:api_control_flow/domain/repositories/bussines/measure_repository.dart';
 import 'package:api_control_flow/domain/repositories/bussines/supply_repository.dart';
 import 'package:api_control_flow/infraestructure/data_sources/bussines/category_api_data_source.dart';
@@ -21,7 +21,7 @@ class InsumoFormScreen extends StatefulWidget {
 class _InsumoFormScreenState extends State<InsumoFormScreen> {
   final dbHelper = DatabaseHelper();
   late SupplyRepository _supplyRepository;
-  late CategoryRepository _categoryApiDataSource;
+  late CategoryProRepository _categoryApiDataSource;
   late MeasureRepository _measureRepository;
 
   final _formKey = GlobalKey<FormState>();
@@ -29,7 +29,6 @@ class _InsumoFormScreenState extends State<InsumoFormScreen> {
   final _unit_priceController = TextEditingController();
   final _unit_costController = TextEditingController();
   final _stockController = TextEditingController();
-  final _weightController = TextEditingController();
   final _id_measureController = TextEditingController();
   final _id_categoryController = TextEditingController();
 
@@ -38,7 +37,7 @@ class _InsumoFormScreenState extends State<InsumoFormScreen> {
 
   OverlayEntry? _bannerEntry;
 
-  List<CategoryModel> _categories = [];
+  List<CategoryProModel> _categories = [];
   List<MeasureModel> _measures = [];
 
   @override
@@ -55,7 +54,7 @@ class _InsumoFormScreenState extends State<InsumoFormScreen> {
   }
 
   Future<void> _loadCategories() async {
-    final categorias = await _categoryApiDataSource.getCategories();
+    final categorias = await _categoryApiDataSource.getCategoriesPro();
     setState(() {
       _categories = categorias;
     });
@@ -66,7 +65,7 @@ class _InsumoFormScreenState extends State<InsumoFormScreen> {
     final db =
         await dbHelper.database; // Obtén la instancia de la base de datos
     _supplyRepository = SupplyApiDateSource(db: db); // Inicializa el repositorio
-    _categoryApiDataSource = CategoryApiDataSource(db: db);
+    _categoryApiDataSource = CategoryProApiDataSource(db: db);
     _measureRepository = MeasureApiDataSource(db: db);
     await _loadCategories();
     await _loadMeasures();
@@ -196,22 +195,6 @@ class _InsumoFormScreenState extends State<InsumoFormScreen> {
               ),
               const SizedBox(height: 16.0),
               TextFormField(
-                controller: _weightController,
-                decoration: InputDecoration(
-                  labelText: 'Peso',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa el precio';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
                 controller: _unit_costController,
                 decoration: InputDecoration(
                   labelText: 'Precio unidad',
@@ -238,13 +221,16 @@ class _InsumoFormScreenState extends State<InsumoFormScreen> {
                       int idMeasure = int.parse(_id_measureController.text);
                       int idCategory = int.parse(_id_measureController.text);
 
-                      final nuevoCliente = SupplyModel(
+                      final nuevoCliente = BuysDetailModel(
                         id: null, // Asegúrate de que tu modelo maneje IDs nulos
-                        name: _nameController.text,
+                        description: _nameController.text,
                         stock: stock,
                         weight: weight,
+                        size: null,
                         unit_cost: unitCost,
                         id_measure: idMeasure,
+                        id_buys: 1,
+                        id_category: 1
                       );
                       await _supplyRepository.insertSupply(nuevoCliente);
 
