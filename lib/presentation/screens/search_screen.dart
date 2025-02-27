@@ -10,7 +10,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final dbHelper = DatabaseHelper();
+  final dbHelper = DatabaseHelper.instance;
   List<dynamic> _orders = []; // Simulación de lista de pedidos
 
   @override

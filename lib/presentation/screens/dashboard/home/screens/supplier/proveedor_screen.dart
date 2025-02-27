@@ -1,5 +1,8 @@
 import 'package:api_control_flow/db/database_helper.dart';
+import 'package:api_control_flow/domain/entities/bussines/documentType/document_type_model.dart';
+import 'package:api_control_flow/domain/repositories/bussines/document_type_repository.dart';
 import 'package:api_control_flow/domain/repositories/users/supplier_repository.dart';
+import 'package:api_control_flow/infraestructure/data_sources/bussines/document_type_api_data_source.dart';
 import 'package:api_control_flow/infraestructure/data_sources/users/supplier_api_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:api_control_flow/domain/entities/users/supplier/supplier_model.dart';
@@ -14,11 +17,13 @@ class ProveedorScreen extends StatefulWidget {
 
 class _ProveedorScreenState extends State<ProveedorScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final dbHelper = DatabaseHelper();
+  final dbHelper = DatabaseHelper.instance;
   late SupplierRepository _supplierRepository;
+  late DocumentTypeRepository _documentTypeRepository;
 
   List<SupplierModel> _suppliers = [];
   List<SupplierModel> _filteredSuppliers = [];
+  List<DocumentTypeModel> _documentTypes = [];
 
   @override
   void initState() {
@@ -27,22 +32,49 @@ class _ProveedorScreenState extends State<ProveedorScreen> {
     _searchController.addListener(_filterSuppliers); // Escuchar cambios
   }
 
-    @override
+  @override
   void dispose() {
-    _searchController.removeListener(_filterSuppliers); // Importante: remover el listener
+    _searchController
+        .removeListener(_filterSuppliers); // Importante: remover el listener
     _searchController.dispose();
     super.dispose();
   }
 
-
   Future<void> _initDatabaseAndLoadSuppliers() async {
     final db = await dbHelper.database;
     _supplierRepository = SupplierApiDataSource(db: db);
+    _documentTypeRepository = DocumentTypeApiDataSource(db: db);
     await _loadSuppliers();
-
+    await _loadDocumentType();
   }
 
+  Future<void> _loadDocumentType() async {
+    final type_documents = await _documentTypeRepository.getDocumentsType();
+    setState(() {
+      _documentTypes = type_documents;
+    });
+  }
 
+  String _getDocumentTypeName(int? documentTypeId) {
+    if (documentTypeId == null) return '';
+
+    var nameDoc = '';
+
+    try {
+      final documentType =
+          _documentTypes.firstWhere((dt) => dt.id == documentTypeId);
+      if (documentType.name == 'Cédula de Ciudadanía') {
+        nameDoc = 'C.C';
+        return nameDoc;
+      } else if (documentType.name == 'Tarjeta de Identidad') {
+        nameDoc = 'T.I';
+        return nameDoc;
+      }
+      return documentType.name;
+    } catch (e) {
+      return 'Tipo desconocido';
+    }
+  }
 
   Future<void> _loadSuppliers() async {
     final proveedores = await _supplierRepository.getSuppliers();
@@ -56,7 +88,7 @@ class _ProveedorScreenState extends State<ProveedorScreen> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredSuppliers = _suppliers
-        .where((h) => h.company_name.toLowerCase().contains(query))
+          .where((h) => h.company_name.toLowerCase().contains(query))
           .toList();
     });
   }
@@ -91,84 +123,266 @@ class _ProveedorScreenState extends State<ProveedorScreen> {
     );
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
-    return Scaffold( // El Scaffold es el widget raíz
+    return Scaffold(
       appBar: AppBar(title: const Text('Proveedores')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column( // El Column va *dentro* del body del Scaffold
+        child: Column(
+          // El Column va *dentro* del body del Scaffold
           children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProveedorFormScreen(),
-                  ),
-                ).then((value) {
-                  if (value == true) {
-                    _loadSuppliers();
-                  }
-                });
-              },
-              child: const Text('Agregar Proveedor'),
-            ),
-            const SizedBox(height: 20),
-            Padding( // Widget de búsqueda (va dentro del Column)
+            const SizedBox(height: 10),
+            Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: TextField(
                 controller: _searchController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Buscar...',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
                 ),
               ),
             ),
-            Expanded( // El Expanded también va dentro del Column
+            Expanded(
+              // El Expanded también va dentro del Column
               child: _filteredSuppliers.isEmpty
                   ? const Center(child: Text('No se encontraron proveedores'))
                   : ListView.builder(
                       itemCount: _filteredSuppliers.length,
                       itemBuilder: (context, index) {
                         final proveedor = _filteredSuppliers[index];
+                        final cardColors = [
+                          Colors.blue.shade700,
+                          Colors.green.shade700,
+                          Colors.purple.shade700,
+                          Colors.indigo.shade700,
+                          Colors.teal.shade700,
+                        ];
+                        final headerColor =
+                            cardColors[index % cardColors.length];
+
                         return Card(
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                          color: Colors.white,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          elevation: 4,
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(16),
-                            title: Text(
-                              proveedor.company_name,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(proveedor.document_number),
-                                Text(proveedor.id_city.toString()),
-                                Text(proveedor.phone),
-                                Text(proveedor.email),
-                                Text(proveedor.address),
-                              ],
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () => (context, proveedor),
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(
+                                color: Colors.grey.shade300, width: 1),
+                          ),
+                          elevation: 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: headerColor,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(8),
+                                    topRight: Radius.circular(8),
+                                  ),
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () =>
-                                      _eliminarProveedor(context, proveedor),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        proveedor.company_name,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 18,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        const SizedBox(height: 12),
+                                        SizedBox(
+                                          width: 38,
+                                          height: 38,
+                                          child: FloatingActionButton(
+                                            heroTag: "accionesRapidasTag",
+                                            mini: true,
+                                            backgroundColor: Colors.white,
+                                            elevation: 3,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              side: BorderSide(
+                                                  color: Colors.blue.shade100,
+                                                  width: 1),
+                                            ),
+                                            onPressed: () {
+                                              // Acción rápida, por ejemplo mostrar un menú de opciones
+                                              showModalBottomSheet(
+                                                context: context,
+                                                shape:
+                                                    const RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.vertical(
+                                                          top: Radius.circular(
+                                                              16)),
+                                                ),
+                                                builder: (context) => Container(
+                                                  padding:
+                                                      const EdgeInsets.all(16),
+                                                  height: 195,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      const Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                left: 10,
+                                                                bottom: 16,
+                                                                top: 5),
+                                                        child: Text(
+                                                          "Acciones rápidas",
+                                                          style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      ListTile(
+                                                        leading: Icon(
+                                                            Icons.history,
+                                                            color: Colors
+                                                                .blue.shade700),
+                                                        title: const Text(
+                                                            "Actualizar Proveedor"),
+                                                        onTap: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                      ),
+                                                      ListTile(
+                                                        leading: Icon(
+                                                            Icons.delete,
+                                                            color: Colors
+                                                                .blue.shade700),
+                                                        title: const Text(
+                                                            "Eliminar Proveedor"),
+                                                        onTap: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                          _eliminarProveedor(
+                                                              context,
+                                                              proveedor);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: const Icon(Icons.more_vert,
+                                                size: 24),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.badge,
+                                        color: headerColor, size: 20),
+                                        const SizedBox(width: 8),
+                                        RichText(
+                                          text: TextSpan(
+                                            style: DefaultTextStyle.of(context).style,
+                                            children: [
+                                              TextSpan(
+                                                text: '${_getDocumentTypeName(proveedor.id_document_type)}. ',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold)
+                                              ),
+                                              TextSpan(
+                                                text: proveedor.document_number),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.phone,
+                                            color: headerColor, size: 20),
+                                        const SizedBox(width: 8),
+                                        RichText(
+                                          text: TextSpan(
+                                            style: DefaultTextStyle.of(context)
+                                                .style,
+                                            children: [
+                                              const TextSpan(
+                                                text: 'Teléfono: ',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              TextSpan(text: proveedor.phone),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.email,
+                                            color: headerColor, size: 20),
+                                        const SizedBox(width: 8),
+                                        Text(proveedor.email),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.location_on,
+                                            color: headerColor, size: 20),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: RichText(
+                                            text: TextSpan(
+                                              style:
+                                                  DefaultTextStyle.of(context)
+                                                      .style,
+                                              children: [
+                                                const TextSpan(
+                                                  text: 'Dirección: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                TextSpan(text: proveedor.address),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
                           ),
                         );
                       },
@@ -176,6 +390,22 @@ class _ProveedorScreenState extends State<ProveedorScreen> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue.shade700,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ProveedorFormScreen(),
+            ),
+          ).then((value) {
+            if (value == true) {
+              _loadSuppliers();
+            }
+          });
+        },
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

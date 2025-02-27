@@ -10,7 +10,7 @@ class SupplyApiDateSource implements SupplyRepository {
   @override
   Future<int> insertSupply(BuysDetailModel supply) async {
     try {
-      return await db.insert('supply', supply.toMap(),
+      return await db.insert('buys_details', supply.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace);
     } catch (err) {
       throw Exception('Error al insertar el insumo: $err');
@@ -20,7 +20,7 @@ class SupplyApiDateSource implements SupplyRepository {
   @override
   Future<List<BuysDetailModel>> getSupplies() async {
     try {
-      final List<Map<String, dynamic>> maps = await db.query('supply');
+      final List<Map<String, dynamic>> maps = await db.query('buys_details');
       return List.generate(maps.length, (i) {
         return BuysDetailModel.fromMap(maps[i]);
       });
@@ -33,7 +33,7 @@ class SupplyApiDateSource implements SupplyRepository {
   Future<int> updateSupply(BuysDetailModel supply) async {
     try {
       return await db.update(
-        'supply',
+        'buys_details',
         supply.toMap(),
         where: 'id = ?',
         whereArgs: [supply.id],
@@ -47,7 +47,7 @@ class SupplyApiDateSource implements SupplyRepository {
   Future<int> deleteSupply(int id) async {
     try {
       return await db.delete(
-        'supply',
+        'buys_details',
         where: 'id = ?',
         whereArgs: [id],
       );
@@ -60,7 +60,7 @@ class SupplyApiDateSource implements SupplyRepository {
   Future<BuysDetailModel?> getSupplyById(int id) async {
     try {
       final List<Map<String, dynamic>> maps = await db.query(
-        'supply',
+        'buys_details',
         where: 'id = ?',
         whereArgs: [id],
         limit: 1,

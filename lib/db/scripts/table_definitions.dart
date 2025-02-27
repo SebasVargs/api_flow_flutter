@@ -159,24 +159,26 @@ class TableDefinitios {
   total DOUBLE,
   id_supplier INTEGER null,
   id_status_bill INTEGER not null,
+  id_client INTEGET null,
   FOREIGN KEY (id_supplier) REFERENCES supplier(id),
-  FOREIGN KEY (id_status_bill) REFERENCES status(id)
+  FOREIGN KEY (id_status_bill) REFERENCES status(id),
+  FOREIGN KEY (id_client) REFERENCES client(id)
   )
   ''';
 
-  static const supply = '''
-  CREATE TABLE supply (
+  static const buysDetails = '''
+  CREATE TABLE buys_details (
   id INTEGER PRIMARY KEY,
-  name TEXT not null,
+  description TEXT not null,
   stock INTEGER not null,
   weight DOUBLE null,
-  size TEXT null,
+  size DOUBLE null,
   unit_cost DOUBLE not null,
   id_measure INTEGER not null,
   id_buys INTEGER not null,
-  id_category INTEGER not null,
+  id_category_sup INTEGER not null,
   FOREIGN KEY (id_buys) REFERENCES buys(id),
-  FOREIGN KEY (id_category) REFERENCES category(id),
+  FOREIGN KEY (id_category_sup) REFERENCES category_sup(id),
   FOREIGN KEY (id_measure) REFERENCES measure(id)
   )
   ''';

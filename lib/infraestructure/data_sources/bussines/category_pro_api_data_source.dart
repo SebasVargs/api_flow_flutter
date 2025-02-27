@@ -9,7 +9,7 @@ class CategoryProApiDataSource implements CategoryProRepository{
 
   @override
   Future<List<CategoryProModel>> getCategoriesPro() async {
-    final List<Map<String, dynamic>> maps = await db.query('category');
+    final List<Map<String, dynamic>> maps = await db.query('category_pro');
     return List.generate(maps.length, (i) {
       return CategoryProModel.fromMap(maps[i]);
     });
@@ -18,7 +18,7 @@ class CategoryProApiDataSource implements CategoryProRepository{
   @override
   Future<int> insertCategoryPro(CategoryProModel category) async {
     try {
-      return await db.insert('category', category.toMap(),
+      return await db.insert('category_pro', category.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace
       );
     } catch (err) {
@@ -30,7 +30,7 @@ class CategoryProApiDataSource implements CategoryProRepository{
   Future<int> updateCategoryPro(CategoryProModel category) async {
     try {
       return await db.update(
-        'category',
+        'category_pro',
         category.toMap(),
         where: 'id = ?',
         whereArgs: [category.id],
@@ -44,7 +44,7 @@ class CategoryProApiDataSource implements CategoryProRepository{
   Future<int> deleteCategoryPro(int id) async {
     try {
       return await db.delete(
-        'category',
+        'category_pro',
         where: 'id = ?',
         whereArgs: [id],
       );

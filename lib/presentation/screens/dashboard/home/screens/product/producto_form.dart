@@ -5,7 +5,7 @@ import 'package:api_control_flow/domain/entities/bussines/supply/supply_model.da
 import 'package:api_control_flow/domain/repositories/bussines/category_pro_repository.dart';
 import 'package:api_control_flow/domain/repositories/bussines/measure_repository.dart';
 import 'package:api_control_flow/domain/repositories/bussines/supply_repository.dart';
-import 'package:api_control_flow/infraestructure/data_sources/bussines/category_api_data_source.dart';
+import 'package:api_control_flow/infraestructure/data_sources/bussines/category_pro_api_data_source.dart';
 import 'package:api_control_flow/infraestructure/data_sources/bussines/measure_api_data_source.dart';
 import 'package:api_control_flow/infraestructure/data_sources/bussines/supply_api_date_source.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
@@ -19,7 +19,7 @@ class InsumoFormScreen extends StatefulWidget {
 }
 
 class _InsumoFormScreenState extends State<InsumoFormScreen> {
-  final dbHelper = DatabaseHelper();
+  final dbHelper = DatabaseHelper.instance;
   late SupplyRepository _supplyRepository;
   late CategoryProRepository _categoryApiDataSource;
   late MeasureRepository _measureRepository;
@@ -230,7 +230,7 @@ class _InsumoFormScreenState extends State<InsumoFormScreen> {
                         unit_cost: unitCost,
                         id_measure: idMeasure,
                         id_buys: 1,
-                        id_category: 1
+                        id_category_sup: 1
                       );
                       await _supplyRepository.insertSupply(nuevoCliente);
 

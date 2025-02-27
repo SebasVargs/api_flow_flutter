@@ -2,17 +2,20 @@ import 'dart:async';
 
 import 'package:api_control_flow/db/scripts/insert_definitions.dart';
 import 'package:api_control_flow/db/scripts/table_definitions.dart';
-import 'package:flutter/material.dart';
+import 'package:api_control_flow/domain/entities/bussines/buys/buys_model.dart';
+import 'package:api_control_flow/domain/entities/bussines/supply/supply_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_migration/sqflite_migration.dart';
 
 class DatabaseHelper {
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
   static Database? _database;
+
+  DatabaseHelper._privateConstructor();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-
     _database = await _open();
     return _database!;
   }
@@ -40,7 +43,7 @@ class DatabaseHelper {
         TableDefinitios.product,
         TableDefinitios.supplier,
         TableDefinitios.buys,
-        TableDefinitios.supply,
+        TableDefinitios.buysDetails,
         TableDefinitios.saleDetail,
         TableDefinitios.tpyeCash,
         TableDefinitios.conceptCash,
@@ -63,16 +66,27 @@ class DatabaseHelper {
         InsertDefinitions.city,
         InsertDefinitions.department
       ],
-      migrationScripts: [ // Scripts de migración (para versiones futuras)
-         // Ejemplo: Creación de la tabla "maps"
+      migrationScripts: [
+        // Scripts de migración (para versiones futuras)
+        // Ejemplo: Creación de la tabla "maps"
         // Agrega aquí más scripts de migración a medida que los necesites
       ],
     );
     return await openDatabaseWithMigration(path, config);
   }
 
-    Future<List<Map<String, dynamic>>> obtenerTodosLosSupplies() async {
+  Future<List<Map<String, dynamic>>> obtenerTodosLosSupplies() async {
     final db = await database;
-    return await db.query('supply'); // Consulta simple a la tabla supply
+    return await db.query('supply');
+  }
+
+  Future<int> insertBuy(BuysModel buy) async {
+    final db = await database;
+    return await db.insert('buys', buy.toMap());
+  }
+
+  Future<int> insertBuyDetail(BuysDetailModel detail) async {
+    final db = await database;
+    return await db.insert('buys_details', detail.toMap());
   }
 }

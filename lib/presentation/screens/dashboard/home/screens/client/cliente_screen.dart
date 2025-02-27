@@ -1,6 +1,9 @@
 import 'package:api_control_flow/db/database_helper.dart';
+import 'package:api_control_flow/domain/entities/bussines/documentType/document_type_model.dart';
 import 'package:api_control_flow/domain/entities/users/client/client_model.dart';
+import 'package:api_control_flow/domain/repositories/bussines/document_type_repository.dart';
 import 'package:api_control_flow/domain/repositories/users/client_repository.dart';
+import 'package:api_control_flow/infraestructure/data_sources/bussines/document_type_api_data_source.dart';
 import 'package:api_control_flow/infraestructure/data_sources/users/client_api_data_source.dart';
 import 'package:flutter/material.dart';
 import 'cliente_form.dart'; // Importa el formulario
@@ -14,11 +17,13 @@ class ClienteScreen extends StatefulWidget {
 
 class _ClienteScreenState extends State<ClienteScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final dbHelper = DatabaseHelper();
+  final dbHelper = DatabaseHelper.instance;
   late ClientRepository _clientRepository;
+  late DocumentTypeRepository _documentTypeRepository;
 
   List<ClientModel> _clients = [];
   List<ClientModel> _filteredClients = [];
+  List<DocumentTypeModel> _documentTypes = [];
 
   @override
   void initState() {
@@ -27,18 +32,20 @@ class _ClienteScreenState extends State<ClienteScreen> {
     _searchController.addListener(_filterClients); // Escuchar cambios
   }
 
-    @override
+  @override
   void dispose() {
-    _searchController.removeListener(_filterClients); // Importante: remover el listener
+    _searchController
+        .removeListener(_filterClients); // Importante: remover el listener
     _searchController.dispose();
     super.dispose();
   }
 
-
   Future<void> _initDatabaseAndLoadClients() async {
     final db = await dbHelper.database;
     _clientRepository = ClientApiDataSource(db: db);
+    _documentTypeRepository = DocumentTypeApiDataSource(db: db);
     await _loadClients();
+    await _loadDocumentType();
   }
 
   Future<void> _loadClients() async {
@@ -49,11 +56,39 @@ class _ClienteScreenState extends State<ClienteScreen> {
     });
   }
 
+  Future<void> _loadDocumentType() async {
+    final type_documents = await _documentTypeRepository.getDocumentsType();
+    setState(() {
+      _documentTypes = type_documents;
+    });
+  }
+
+  String _getDocumentTypeName(int? documentTypeId) {
+    if (documentTypeId == null) return '';
+
+    var nameDoc = '';
+
+    try {
+      final documentType =
+          _documentTypes.firstWhere((dt) => dt.id == documentTypeId);
+      if (documentType.name == 'Cédula de Ciudadanía') {
+        nameDoc = 'C.C';
+        return nameDoc;
+      } else if (documentType.name == 'Tarjeta de Identidad') {
+        nameDoc = 'T.I';
+        return nameDoc;
+      }
+      return documentType.name;
+    } catch (e) {
+      return 'Tipo desconocido';
+    }
+  }
+
   void _filterClients() {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredClients = _clients
-        .where((h) => h.name.toLowerCase().contains(query))
+          .where((h) => h.company_name.toLowerCase().contains(query))
           .toList();
     });
   }
@@ -88,82 +123,272 @@ class _ClienteScreenState extends State<ClienteScreen> {
     );
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
-    return Scaffold( // El Scaffold es el widget raíz
-      appBar: AppBar(title: const Text('Clientes')),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Clientes'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column( // El Column va *dentro* del body del Scaffold
+        child: Column(
           children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ClienteFormScreen(),
-                  ),
-                ).then((value) {
-                  if (value == true) {
-                    _loadClients();
-                  }
-                });
-              },
-              child: const Text('Agregar Cliente'),
-            ),
-            const SizedBox(height: 20),
-            Padding( // Widget de búsqueda (va dentro del Column)
+            const SizedBox(height: 10),
+            Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: TextField(
                 controller: _searchController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Buscar...',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
                 ),
               ),
             ),
-            Expanded( // El Expanded también va dentro del Column
+            Expanded(
               child: _filteredClients.isEmpty
                   ? const Center(child: Text('No se encontraron clientes'))
                   : ListView.builder(
                       itemCount: _filteredClients.length,
                       itemBuilder: (context, index) {
                         final cliente = _filteredClients[index];
+                        final cardColors = [
+                          Colors.blue.shade700,
+                          Colors.green.shade700,
+                          Colors.purple.shade700,
+                          Colors.indigo.shade700,
+                          Colors.teal.shade700,
+                        ];
+                        final headerColor =
+                            cardColors[index % cardColors.length];
+
                         return Card(
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                          color: Colors.white,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          elevation: 4,
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(16),
-                            title: Text(
-                              cliente.name,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(cliente.phone),
-                                Text(cliente.email),
-                                Text(cliente.address),
-                              ],
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () => (context, cliente),
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(
+                                color: Colors.grey.shade300, width: 1),
+                          ),
+                          elevation: 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Cabecera estilo Classroom
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: headerColor,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(8),
+                                    topRight: Radius.circular(8),
+                                  ),
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () =>
-                                      _eliminarCliente(context, cliente),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        cliente.company_name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 18,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        const SizedBox(height: 12),
+                                        SizedBox(
+                                          width: 38,
+                                          height: 38,
+                                          child: FloatingActionButton(
+                                            heroTag: "accionesRapidasTag",
+                                            mini: true,
+                                            backgroundColor: Colors.white,
+                                            elevation: 3,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              side: BorderSide(
+                                                  color: Colors.blue.shade100,
+                                                  width: 1),
+                                            ),
+                                            onPressed: () {
+                                              // Acción rápida, por ejemplo mostrar un menú de opciones
+                                              showModalBottomSheet(
+                                                context: context,
+                                                shape:
+                                                    const RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.vertical(
+                                                          top: Radius.circular(
+                                                              16)),
+                                                ),
+                                                builder: (context) => Container(
+                                                  padding:
+                                                      const EdgeInsets.all(16),
+                                                  height: 195,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      const Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                left: 10,
+                                                                bottom: 16,
+                                                                top: 5),
+                                                        child: Text(
+                                                          "Acciones rápidas",
+                                                          style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      ListTile(
+                                                        leading: Icon(
+                                                            Icons.history,
+                                                            color: Colors
+                                                                .blue.shade700),
+                                                        title: const Text(
+                                                            "Actualizar Cliente"),
+                                                        onTap: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                      ),
+                                                      ListTile(
+                                                        leading: Icon(
+                                                            Icons.delete,
+                                                            color: Colors
+                                                                .blue.shade700),
+                                                        title: const Text(
+                                                            "Eliminar Cliente"),
+                                                        onTap: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                          _eliminarCliente(
+                                                              context, cliente);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: const Icon(Icons.more_vert,
+                                                size: 24),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              // Contenido de la tarjeta
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.badge,
+                                            color: headerColor, size: 20),
+                                        const SizedBox(width: 8),
+                                        RichText(
+                                          text: TextSpan(
+                                            style: DefaultTextStyle.of(context)
+                                                .style,
+                                            children: [
+                                              TextSpan(
+                                                text:
+                                                    '${_getDocumentTypeName(cliente.id_document_type)}. ',
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              TextSpan(
+                                                  text:
+                                                      cliente.document_number),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.phone,
+                                            color: headerColor, size: 20),
+                                        const SizedBox(width: 8),
+                                        RichText(
+                                          text: TextSpan(
+                                            style: DefaultTextStyle.of(context)
+                                                .style,
+                                            children: [
+                                              const TextSpan(
+                                                text: 'Teléfono: ',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              TextSpan(text: cliente.phone),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.email,
+                                            color: headerColor, size: 20),
+                                        const SizedBox(width: 8),
+                                        Text(cliente.email),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.location_on,
+                                            color: headerColor, size: 20),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: RichText(
+                                            text: TextSpan(
+                                              style:
+                                                  DefaultTextStyle.of(context)
+                                                      .style,
+                                              children: [
+                                                const TextSpan(
+                                                  text: 'Dirección: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                TextSpan(text: cliente.address),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         );
                       },
@@ -171,6 +396,22 @@ class _ClienteScreenState extends State<ClienteScreen> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue.shade700,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ClienteFormScreen(),
+            ),
+          ).then((value) {
+            if (value == true) {
+              _loadClients();
+            }
+          });
+        },
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

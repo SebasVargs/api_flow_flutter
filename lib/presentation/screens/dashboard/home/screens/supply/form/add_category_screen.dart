@@ -12,7 +12,7 @@ class AddCategoryScreen extends StatefulWidget {
 }
 
 class _AddCategoryScreenState extends State<AddCategoryScreen> {
-  final dbHelper = DatabaseHelper();
+  final dbHelper = DatabaseHelper.instance;
   late CategorySupRepository _categorySupRepository;
 
   final _formKey = GlobalKey<FormState>();

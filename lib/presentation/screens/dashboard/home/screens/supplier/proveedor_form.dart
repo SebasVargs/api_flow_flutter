@@ -22,7 +22,7 @@ class ProveedorFormScreen extends StatefulWidget {
 }
 
 class _ProveedorFormScreenState extends State<ProveedorFormScreen> {
-  final dbHelper = DatabaseHelper();
+  final dbHelper = DatabaseHelper.instance;
   late SupplierRepository _supplierRepository;
   late CityRepository _cityRepository;
   late DepartmentRepository _departmentRepository;
@@ -126,209 +126,221 @@ class _ProveedorFormScreenState extends State<ProveedorFormScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Crear Proveedor')),
       body: Padding(
-        padding: const EdgeInsets.all(40.0),
-        child: Form(
-          // Envuelve los widgets en un Form
-          key: _formKey, // Asigna la clave del formulario
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _companyNameController,
-                decoration: InputDecoration(
-                  labelText: 'Nombre',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa el nombre';
-                  }
-                  return null;
-                },
-                autofocus: true,
-              ),
-              const SizedBox(height: 16.0),
-              DropdownButtonFormField<int>(
-                decoration: InputDecoration(
-                  labelText: 'Tipo de documento',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                ),
-                value: _selectedDocumentTypeId,
-                items: _document_type.map((docT) {
-                  return DropdownMenuItem<int>(
-                    value: docT.id,
-                    child: Text(docT.name),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  _selectedDocumentTypeId = value;
-                },
-                validator: (value) =>
-                    value == null ? 'Por favor, selecciona un proveedor' : null,
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _documentNumberController,
-                decoration: InputDecoration(
-                  labelText: 'Numero de documento',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa el nombre';
-                  }
-                  return null;
-                },
-                autofocus: true,
-              ),
-              const SizedBox(height: 16.0),
-              DropdownButtonFormField<int>(
-                decoration: InputDecoration(
-                  labelText: 'Departamento',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                ),
-                value: _selectedDepartmentId,
-                items: _departments.map((department) {
-                  return DropdownMenuItem<int>(
-                    value: department.id,
-                    child: Text(department.name),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  _selectedDepartmentId = value;
-                },
-                validator: (value) =>
-                    value == null ? 'Por favor, selecciona un proveedor' : null,
-              ),
-              const SizedBox(height: 16.0),
-              DropdownButtonFormField<int>(
-                decoration: InputDecoration(
-                  labelText: 'Ciudad',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                ),
-                value: _selectedCityId,
-                items: _cities.map((city) {
-                  return DropdownMenuItem<int>(
-                    value: city.id,
-                    child: Text(city.name),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  _selectedCityId = value;
-                },
-                validator: (value) =>
-                    value == null ? 'Por favor, selecciona un proveedor' : null,
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _phoneController,
-                decoration: InputDecoration(
-                  labelText: 'Teléfono',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                  errorBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Colors.red)), // Estilo para el error
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa el teléfono';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa el email';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _addressController,
-                decoration: InputDecoration(
-                  labelText: 'Dirección',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa la dirección';
-                  }
-                  return null;
-                },
-              ),
-              const Padding(padding: EdgeInsets.all(16.0)),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    try {
-                      final newSupplier = SupplierModel(
-                          id: null,
-                          company_name: _companyNameController.text,
-                          document_number: _documentNumberController.text,
-                          phone: _phoneController.text,
-                          email: _emailController.text,
-                          address: _addressController.text,
-                          id_document_type: _selectedDocumentTypeId!,
-                          id_city: _selectedCityId!,
-                          id_department: _selectedDepartmentId!);
+          padding: const EdgeInsets.all(40.0),
+          child: SingleChildScrollView(
+              child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
+            child: IntrinsicHeight(
+              child: Form(
+                // Envuelve los widgets en un Form
+                key: _formKey, // Asigna la clave del formulario
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _companyNameController,
+                      decoration: InputDecoration(
+                        labelText: 'Nombre',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor, ingresa el nombre';
+                        }
+                        return null;
+                      },
+                      autofocus: true,
+                    ),
+                    const SizedBox(height: 16.0),
+                    DropdownButtonFormField<int>(
+                      decoration: InputDecoration(
+                        labelText: 'Tipo de documento',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                      ),
+                      value: _selectedDocumentTypeId,
+                      items: _document_type.map((docT) {
+                        return DropdownMenuItem<int>(
+                          value: docT.id,
+                          child: Text(docT.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        _selectedDocumentTypeId = value;
+                      },
+                      validator: (value) => value == null
+                          ? 'Por favor, selecciona un proveedor'
+                          : null,
+                    ),
+                    const SizedBox(height: 16.0),
+                    TextFormField(
+                      controller: _documentNumberController,
+                      decoration: InputDecoration(
+                        labelText: 'Numero de documento',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor, ingresa el nombre';
+                        }
+                        return null;
+                      },
+                      autofocus: true,
+                    ),
+                    const SizedBox(height: 16.0),
+                    DropdownButtonFormField<int>(
+                      decoration: InputDecoration(
+                        labelText: 'Departamento',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                      ),
+                      value: _selectedDepartmentId,
+                      items: _departments.map((department) {
+                        return DropdownMenuItem<int>(
+                          value: department.id,
+                          child: Text(department.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        _selectedDepartmentId = value;
+                      },
+                      validator: (value) => value == null
+                          ? 'Por favor, selecciona un proveedor'
+                          : null,
+                    ),
+                    const SizedBox(height: 16.0),
+                    DropdownButtonFormField<int>(
+                      decoration: InputDecoration(
+                        labelText: 'Ciudad',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                      ),
+                      value: _selectedCityId,
+                      items: _cities.map((city) {
+                        return DropdownMenuItem<int>(
+                          value: city.id,
+                          child: Text(city.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        _selectedCityId = value;
+                      },
+                      validator: (value) => value == null
+                          ? 'Por favor, selecciona un proveedor'
+                          : null,
+                    ),
+                    const SizedBox(height: 16.0),
+                    TextFormField(
+                      controller: _phoneController,
+                      decoration: InputDecoration(
+                        labelText: 'Teléfono',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                        errorBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.red)), // Estilo para el error
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor, ingresa el teléfono';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16.0),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor, ingresa el email';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16.0),
+                    TextFormField(
+                      controller: _addressController,
+                      decoration: InputDecoration(
+                        labelText: 'Dirección',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor, ingresa la dirección';
+                        }
+                        return null;
+                      },
+                    ),
+                    const Padding(padding: EdgeInsets.all(16.0)),
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          try {
+                            final newSupplier = SupplierModel(
+                                id: null,
+                                company_name: _companyNameController.text,
+                                document_number: _documentNumberController.text,
+                                phone: _phoneController.text,
+                                email: _emailController.text,
+                                address: _addressController.text,
+                                id_document_type: _selectedDocumentTypeId!,
+                                id_city: _selectedCityId!,
+                                id_department: _selectedDepartmentId!);
 
-                      await _supplierRepository.insertSupplier(newSupplier);
+                            await _supplierRepository
+                                .insertSupplier(newSupplier);
 
-                      _companyNameController.clear();
-                      _documentNumberController.clear();
-                      _phoneController.clear();
-                      _emailController.clear();
-                      _addressController.clear();
+                            _companyNameController.clear();
+                            _documentNumberController.clear();
+                            _phoneController.clear();
+                            _emailController.clear();
+                            _addressController.clear();
 
-                      setState(() {
-                        _selectedDocumentTypeId = null;
-                        _selectedCityId = null;
-                        _selectedDepartmentId = null;
-                      });
+                            setState(() {
+                              _selectedDocumentTypeId = null;
+                              _selectedCityId = null;
+                              _selectedDepartmentId = null;
+                            });
 
-                      _mostrarBanner(context);
-                    } catch (err) {
-                      print('Error al guardar el proveedor: $err');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content:
-                                Text('Error al guardar el proveedor: $err')),
-                      );
-                    }
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 60, vertical: 18), // Padding interno
-                  textStyle: const TextStyle(fontSize: 16), // Tamaño de texto
-                  elevation: 5,
+                            _mostrarBanner(context);
+                          } catch (err) {
+                            print('Error al guardar el proveedor: $err');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Error al guardar el proveedor: $err')),
+                            );
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 60, vertical: 18), // Padding interno
+                        textStyle:
+                            const TextStyle(fontSize: 16), // Tamaño de texto
+                        elevation: 5,
+                      ),
+                      child: const Text('Guardar'),
+                    ),
+                  ],
                 ),
-                child: const Text('Guardar'),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
+      ))),
     );
   }
 }

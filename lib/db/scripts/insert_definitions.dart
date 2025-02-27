@@ -20,10 +20,7 @@ class InsertDefinitions {
   static const statusBill = '''
   INSERT INTO status_bill (name) VALUES
   ('Pendiente'),
-  ('Pagado'),
-  ('Vencido'),
-  ('Cancelado'),
-  ('Reembolsado')
+  ('Pagado')
   ''';
 
   static const measure = '''
@@ -52,7 +49,7 @@ class InsertDefinitions {
   ''';
 
   static const categoryPro = '''
-  INSERT INTO category_sup (name) VALUES
+  INSERT INTO category_pro (name) VALUES
   ('Lulo'),
   ('Guanábana'),
   ('Guayaba'),

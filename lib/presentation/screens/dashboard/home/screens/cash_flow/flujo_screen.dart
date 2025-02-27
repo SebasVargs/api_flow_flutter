@@ -17,7 +17,7 @@ class CashFlowScreen extends StatefulWidget {
 
 class _CashFlowScreenState extends State<CashFlowScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final dbHelper = DatabaseHelper();
+  final dbHelper = DatabaseHelper.instance;
   late ClientRepository _clientRepository;
 
   List<ClientModel> _clients = [];
@@ -56,7 +56,7 @@ class _CashFlowScreenState extends State<CashFlowScreen> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredClients = _clients
-        .where((h) => h.name.toLowerCase().contains(query))
+        .where((h) => h.company_name.toLowerCase().contains(query))
           .toList();
     });
   }
@@ -172,7 +172,7 @@ class _CashFlowScreenState extends State<CashFlowScreen> {
                           child: ListTile(
                             contentPadding: const EdgeInsets.all(16),
                             title: Text(
-                              cliente.name,
+                              cliente.company_name,
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             subtitle: Column(

@@ -14,7 +14,7 @@ class ProductoScreen extends StatefulWidget {
 
 class _ProductoScreenState extends State<ProductoScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final dbHelper = DatabaseHelper();
+  final dbHelper = DatabaseHelper.instance;
   late ProductRepository _productRepository;
 
   List<ProductModel> _products = [];

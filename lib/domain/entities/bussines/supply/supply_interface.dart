@@ -7,7 +7,7 @@ abstract class BuysDetailInterface {
   double get unit_cost;
   int get id_measure;
   int? get id_buys;
-  int get id_category;
+  int get id_category_sup;
   
   Map<String, dynamic> toJson();
   Map<String, dynamic> toMap();

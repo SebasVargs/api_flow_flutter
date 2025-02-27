@@ -16,9 +16,9 @@ class BuysDetailModel implements BuysDetailInterface{
   @override
   final int id_measure;
   @override
-  final int? id_buys;
+  int? id_buys;
   @override
-  final int id_category;
+  final int id_category_sup;
 
 
   BuysDetailModel({
@@ -30,7 +30,7 @@ class BuysDetailModel implements BuysDetailInterface{
     required this.unit_cost,
     required this.id_measure,
     this.id_buys,
-    required this.id_category
+    required this.id_category_sup
   });
 
   factory BuysDetailModel.fromJson(Map<String, dynamic> json){
@@ -43,7 +43,7 @@ class BuysDetailModel implements BuysDetailInterface{
       unit_cost: json['unit_cost'],
       id_measure: json['id_measuse'],
       id_buys: json['id_buys'],
-      id_category: json['id_category']
+      id_category_sup: json['id_category_sup']
     );
   }
 
@@ -57,7 +57,7 @@ class BuysDetailModel implements BuysDetailInterface{
       unit_cost: map['unit_cost'],
       id_measure: map['id_measure'],
       id_buys: map['id_buys'],
-      id_category: map['id_category']
+      id_category_sup: map['id_category_sup']
     );
   }
 
@@ -71,7 +71,7 @@ class BuysDetailModel implements BuysDetailInterface{
       'unit_cost': unit_cost,
       'id_measure': id_measure,
       'id_buys': id_buys,
-      'id_category': id_category
+      'id_category_sup': id_category_sup
     };
   }
 
@@ -85,7 +85,7 @@ class BuysDetailModel implements BuysDetailInterface{
       'unit_cost': unit_cost,
       'id_measure': id_measure,
       'id_buys': id_buys,
-      'id_category': id_category
+      'id_category_sup': id_category_sup
     };
   }
 }

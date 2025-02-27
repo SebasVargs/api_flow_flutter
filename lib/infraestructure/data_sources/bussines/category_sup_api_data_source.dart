@@ -9,7 +9,7 @@ class CategorySupApiDataSource implements CategorySupRepository{
 
   @override
   Future<List<CategorySupModel>> getCategoriesSup() async {
-    final List<Map<String, dynamic>> maps = await db.query('category');
+    final List<Map<String, dynamic>> maps = await db.query('category_sup');
     return List.generate(maps.length, (i) {
       return CategorySupModel.fromMap(maps[i]);
     });
@@ -18,7 +18,7 @@ class CategorySupApiDataSource implements CategorySupRepository{
   @override
   Future<int> insertCategorySup(CategorySupModel category) async {
     try {
-      return await db.insert('category', category.toMap(),
+      return await db.insert('category_sup', category.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace
       );
     } catch (err) {
@@ -30,7 +30,7 @@ class CategorySupApiDataSource implements CategorySupRepository{
   Future<int> updateCategorySup(CategorySupModel category) async {
     try {
       return await db.update(
-        'category',
+        'category_sup',
         category.toMap(),
         where: 'id = ?',
         whereArgs: [category.id],
@@ -44,7 +44,7 @@ class CategorySupApiDataSource implements CategorySupRepository{
   Future<int> deleteCategorySup(int id) async {
     try {
       return await db.delete(
-        'category',
+        'category_sup',
         where: 'id = ?',
         whereArgs: [id],
       );

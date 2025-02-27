@@ -2,7 +2,7 @@ import 'package:api_control_flow/domain/entities/bussines/buys/buys_model.dart';
 import 'package:api_control_flow/domain/repositories/bussines/buys_repository.dart';
 import 'package:sqflite/sqflite.dart';
 
-class BuysApiDataSource implements BuysRepository{
+class BuysApiDataSource implements BuysRepository {
   final Database db;
 
   BuysApiDataSource({required this.db});
@@ -19,8 +19,7 @@ class BuysApiDataSource implements BuysRepository{
   Future<int> insertBuys(BuysModel buys) async {
     try {
       return await db.insert('buys', buys.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace
-      );
+          conflictAlgorithm: ConflictAlgorithm.replace);
     } catch (err) {
       throw Exception('Error al insertar la compra: $err');
     }
@@ -29,14 +28,24 @@ class BuysApiDataSource implements BuysRepository{
   @override
   Future<int> updateBuys(BuysModel buys) async {
     try {
-      return await db.update(
-        'buys',
-        buys.toMap(),
-        where: 'id = ?',
-        whereArgs: [buys.id]
-      );
+      return await db
+          .update('buys', buys.toMap(), where: 'id = ?', whereArgs: [buys.id]);
     } catch (err) {
       throw Exception('Error al actualizar la compra');
+    }
+  }
+
+  @override
+  Future<int> updateBuyStatus(int idCompra, int nuevoEstado) async {
+    try {
+      return await db.update(
+        'buys', // Tabla que contiene el id_status_bill
+        {'id_status_bill': nuevoEstado},
+        where: 'id = ?',
+        whereArgs: [idCompra],
+      );
+    } catch (err) {
+      throw Exception('Error al actualizar el estado de la compra: $err');
     }
   }
 

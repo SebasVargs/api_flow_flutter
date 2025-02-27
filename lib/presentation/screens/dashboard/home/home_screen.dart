@@ -14,20 +14,21 @@ class HomeScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.only(top: 30.0),
+        padding: const EdgeInsets.only(top: 40.0),
         child: Column(
           children: [
+            // Primer ítem que ocupa todo el ancho y altura específica
             SizedBox(
-              height: 200,
+              height: 180,
               child: MenuCard(
                 title: 'Flujo de Caja',
                 icon: Icons.monetization_on,
                 color: Colors.lightGreenAccent,
                 onTap: () {
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const CashFlowScreen())
-                  );
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CashFlowScreen()));
                 },
               ),
             ),
@@ -42,7 +43,8 @@ class HomeScreen extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const ProductoScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const ProductoScreen()),
                       );
                     },
                   ),
@@ -56,7 +58,8 @@ class HomeScreen extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const ProveedorScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const ProveedorScreen()),
                       );
                     },
                   ),
@@ -73,9 +76,9 @@ class HomeScreen extends StatelessWidget {
                     color: Colors.orange,
                     onTap: () {
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ClienteScreen())
-                      );
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ClienteScreen()));
                     },
                   ),
                 ),
@@ -88,7 +91,8 @@ class HomeScreen extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const InsumoScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const InsumoScreen()),
                       );
                     },
                   ),

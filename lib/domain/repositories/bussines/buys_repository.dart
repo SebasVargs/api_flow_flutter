@@ -4,5 +4,6 @@ abstract class BuysRepository{
   Future<List<BuysModel>> getBuys();
   Future<int> insertBuys(BuysModel buys);
   Future<int> updateBuys(BuysModel buys);
+  Future<int> updateBuyStatus(int idCompra, int nuevoEstado);
   Future<int> deleteBuys(int id);
 }
